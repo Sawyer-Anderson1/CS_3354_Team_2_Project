@@ -1,0 +1,18 @@
+# this file builds a python environment for the backend
+# Use the official Python image as a base
+FROM python:3.9
+
+# set the working directory in the container
+WORKDIR /app
+
+# copy project files to the container
+COPY . /app
+
+# install dependencies
+RUN pip install fastapi uvicorn psycopg2 scikit-learn sqlalchemy
+
+# expose port 8000 for FastAPI
+EXPOSE 8000
+
+# this command starts the fastapi app when the container runs
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
