@@ -49,6 +49,8 @@ def find_matching_volunteers(
     ])
 
     # Create feature vector for the aid request
+    # will probably need to add more features to this
+    # such as the type of aid request and help needed, level of urgency, etc.
     request_features = np.array([[aid_request.latitude, aid_request.longitude]])
 
     # Initialize and fit the nearest neighbors model

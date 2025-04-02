@@ -3,6 +3,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordBearer
 from typing import Optional
 import uvicorn
+from database import engine, Base
+from app.api import users, aid_requests, volunteers
+
+# Create database tables
+Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
     title="Disaster Relief Platform API",
@@ -22,9 +27,18 @@ app.add_middleware(
 # OAuth2 scheme for token authentication
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
+# Include routers
+app.include_router(users.router)
+app.include_router(aid_requests.router)
+app.include_router(volunteers.router)
+
 @app.get("/")
 async def root():
-    return {"message": "Welcome to the Disaster Relief Platform API"}
+    return {
+        "message": "Welcome to the Disaster Relief Platform API",
+        "docs_url": "/docs",
+        "redoc_url": "/redoc"
+    }
 
 @app.get("/health")
 async def health_check():
