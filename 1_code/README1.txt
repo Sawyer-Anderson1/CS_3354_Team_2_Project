@@ -2,7 +2,7 @@ Project Structure Overview
   backend (/backend):
     Key files:
     main.py: The main entry point for the backend server
-    matching.py: Likely contains the matching algorithm logic
+    matching.py: contains the matching algorithm logic
     auth.py: Handles authentication and authorization
     models.py: Defines the database models
     schemas.py: Contains data validation schemas
@@ -13,17 +13,14 @@ Project Structure Overview
     .env.example: Template for environment variables
 
     Key Functionality
-    The project appears to be a matching system with both web and mobile interfaces. The backend is built with Python and includes:
     Authentication System (auth.py)
-    Handles user authentication and authorization
-    Manages user sessions and security
+      Handles user authentication and authorization
+      Manages user sessions and security
     Matching Algorithm (matching.py)
-    Contains the core logic for matching users or items
-    Likely implements specific matching criteria and algorithms
+      Contains the core logic for matching users or items
+      Implements matching based off distance from volunteers, and uses the KNN algorithm with ball tree.
     Database Management
-    Uses SQLAlchemy (based on the presence of alembic.ini)
-    Includes models for data structure
+      Uses SQLAlchemy (based on the presence of alembic.ini)
+      Includes models for data structure
     Has migration support for database versioning
-    API Layer
-    The main.py file likely serves as the API entry point
-    Handles routing and request processing
+   
