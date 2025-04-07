@@ -1,4 +1,3 @@
-// UI for requesting supplies or help 
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import '../models/request.dart';
@@ -54,6 +53,12 @@ class _RequestPostingScreenState extends State<RequestPostingScreen> {
 
       setState(() {
         _currentRequests = Future.value(_currentRequestsList);
+        // Reset the form fields and location
+        _formKey.currentState!.reset();
+        _location = null;
+        _aidType = 'Medical';
+        _description = '';
+        _name = '';
       });
     }
   }
@@ -167,3 +172,4 @@ class _RequestPostingScreenState extends State<RequestPostingScreen> {
     );
   }
 }
+

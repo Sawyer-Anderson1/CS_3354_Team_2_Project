@@ -3,15 +3,15 @@
     "name": "Casey Nguyen",
     "type": "Medical",
     "description": "Need medical assistance immediately.",
-    "latitude": 37.7749,
-    "longitude": -122.4194
+    "latitude": 20.7827,
+    "longitude": -110.2374
   },
   {
     "name": "Kevin",
     "type": "Shelter",
     "description": "House burned down.",
-    "latitude": 37.7749,
-    "longitude": -122.4194
+    "latitude": 10.2947,
+    "longitude": -152.3850
   },
   {
     "name": "Andy",

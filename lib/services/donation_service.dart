@@ -16,5 +16,3 @@ Future<List<Donation>> fetchDonations() async {
   }
 }
 
-
-
