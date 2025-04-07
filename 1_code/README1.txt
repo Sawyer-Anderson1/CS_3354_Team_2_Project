@@ -22,5 +22,8 @@ Project Structure Overview
     Database Management
       Uses SQLAlchemy (based on the presence of alembic.ini)
       Includes models for data structure
-    Has migration support for database versioning
+      Has migration support for database versioning
+    API Layer
+      The main.py file serves as the API entry point
+      Handles routing and request processing
    
