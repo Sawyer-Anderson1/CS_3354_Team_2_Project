@@ -1,4 +1,4 @@
-// lib/models/user.dart
+// getting info from json file 
 class User {
   final String email;
   final String password;

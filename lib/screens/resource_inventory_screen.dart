@@ -1,3 +1,4 @@
+// UI to update resource inventory
 import 'package:flutter/material.dart';
 import '../models/resource.dart';
 // ignore: library_prefixes

@@ -1,3 +1,6 @@
+// try catches data from request.dart 
+// maps the fetched data
+// catches any errors 
 import 'dart:convert';
 import 'package:flutter/services.dart' show rootBundle;
 import '../models/request.dart';

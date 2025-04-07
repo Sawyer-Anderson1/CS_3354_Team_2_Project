@@ -1,3 +1,5 @@
+// fetching data in the try catch block
+// catches any errors 
 import 'dart:convert';
 import 'package:flutter/services.dart' show rootBundle;
 import '../models/donation.dart';

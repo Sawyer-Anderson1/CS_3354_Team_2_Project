@@ -1,3 +1,4 @@
+// gettng info from json file 
 class Resource {
   final String name;
   final int quantity;

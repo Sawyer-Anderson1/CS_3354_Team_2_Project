@@ -1,4 +1,4 @@
-// lib/screens/signup_screen.dart
+// UI for signup / sign in 
 import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
 import '../models/user.dart';

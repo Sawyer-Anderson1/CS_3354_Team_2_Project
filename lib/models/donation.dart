@@ -1,3 +1,4 @@
+// getting info from json file 
 class Donation {
   final String name;
   final String type;

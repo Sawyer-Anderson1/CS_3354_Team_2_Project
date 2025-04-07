@@ -1,3 +1,4 @@
+// UI for donation screen
 import 'package:flutter/material.dart';
 import '../models/donation.dart';
 import '../services/donation_service.dart';

@@ -1,3 +1,4 @@
+// UI for emergency alerts 
 import 'package:flutter/material.dart';
 import '../models/alert.dart';
 import '../services/emergency_alert_service.dart';
