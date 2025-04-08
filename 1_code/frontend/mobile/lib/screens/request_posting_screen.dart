@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class RequestPostingScreen extends StatefulWidget {
   const RequestPostingScreen({super.key});
@@ -23,7 +25,7 @@ class _RequestPostingScreenState extends State<RequestPostingScreen> {
     setState(() => _location = position);
   }
 
-  void _submitRequest() {
+  Future<void> _submitRequest() async {
     if (_formKey.currentState!.validate() && _location != null) {
       _formKey.currentState!.save();
 
@@ -34,12 +36,29 @@ class _RequestPostingScreenState extends State<RequestPostingScreen> {
         'longitude': _location!.longitude,
       };
 
-      // TODO: Replace with actual POST call to backend
-      print('Submitting aid request: $requestData');
+      try {
+        final response = await http.post(
+          Uri.parse(
+            'http://127.0.0.1:8000/requests',
+          ), // Replace with real backend URL if deployed
+          headers: {'Content-Type': 'application/json'},
+          body: jsonEncode(requestData),
+        );
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Request submitted (mocked).')),
-      );
+        if (response.statusCode == 200 || response.statusCode == 201) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Request submitted successfully!')),
+          );
+        } else {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('Failed: ${response.body}')));
+        }
+      } catch (e) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error: $e')));
+      }
     }
   }
 
@@ -53,6 +72,31 @@ class _RequestPostingScreenState extends State<RequestPostingScreen> {
           key: _formKey,
           child: ListView(
             children: [
+              // Static emergency alert banner for Deliverable 1 (mocked warning)
+              Container(
+                padding: const EdgeInsets.all(12),
+                margin: const EdgeInsets.only(bottom: 16),
+                decoration: BoxDecoration(
+                  color: Colors.red.shade100,
+                  border: Border.all(color: Colors.red, width: 1.5),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
+                  children: const [
+                    Icon(Icons.warning, color: Colors.red),
+                    SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        '⚠️ EMERGENCY ALERT: Flooding reported in your area. Stay alert and avoid low ground.',
+                        style: TextStyle(
+                          color: Colors.red,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
               DropdownButtonFormField<String>(
                 value: _aidType,
                 items:

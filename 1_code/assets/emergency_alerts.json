@@ -1,0 +1,33 @@
+[
+    {
+      "alertTitle": "Flood Warning",
+      "alertDescription": "Severe flooding expected in the downtown area. Please evacuate immediately.",
+      "alertDate": "2025-04-05"
+    },
+    {
+      "alertTitle": "Hail Watch",
+      "alertDescription": "Hail possible in the region. Take shelter immediately.",
+      "alertDate": "2025-04-05"
+    },
+    {
+      "alertTitle": "Flood Warning",
+      "alertDescription": "Severe flooding expected in the downtown area. Please evacuate immediately.",
+      "alertDate": "2025-04-06"
+    },
+    {
+      "alertTitle": "Thunder Watch",
+      "alertDescription": "Thunder possible in the region. Take shelter immediately.",
+      "alertDate": "2025-04-06"
+    },
+    {
+      "alertTitle": "Earthquake Warning",
+      "alertDescription": "Earthquake expected in the downtown area. Please evacuate immediately.",
+      "alertDate": "2025-04-07"
+    },
+    {
+      "alertTitle": "Wildfire Alert",
+      "alertDescription": "A wildfire has been reported near your area. Stay inside and monitor for updates.",
+      "alertDate": "2025-04-07"
+    }
+  ]
+  
