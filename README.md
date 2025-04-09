@@ -41,7 +41,6 @@ The project consists of a Flutter frontend (for web, mobile, and desktop) and a 
 
 ```plaintext
 CS_3354_Team_2_Project/
-├── .gitignore                  # Git ignore configuration
 ├── backend/                    # Contains backend code and related files
 │   ├── 1_code/                 # FastAPI backend source code
 │   │   ├── main.py             # FastAPI app entry point, includes matching endpoints
@@ -74,7 +73,8 @@ CS_3354_Team_2_Project/
 │   ├── linux/                  # Linux specific files
 │   ├── test/                   # Flutter tests
 │   └── pubspec.yaml            # Flutter dependencies
-└── README(unified).md          # Main project README
+├── .gitignore                  # Git ignore configuration
+└── README.md                   # Main project README
 ```
 
 *(Note: The root project directory is `CS_3354_Team_2_Project`.)*
