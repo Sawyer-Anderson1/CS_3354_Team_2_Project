@@ -1,8 +1,0 @@
-fastapi
-uvicorn[standard]
-firebase-admin
-scikit-learn
-numpy
-requests
-geopy
-joblib
