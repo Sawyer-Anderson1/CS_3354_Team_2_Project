@@ -1,0 +1,34 @@
+[
+  {
+    "name": "Casey Nguyen",
+    "type": "Medical",
+    "description": "Need medical assistance immediately.",
+    "latitude": 20.7827,
+    "longitude": -110.2374
+  },
+  {
+    "name": "Kevin",
+    "type": "Shelter",
+    "description": "House burned down.",
+    "latitude": 10.2947,
+    "longitude": -152.3850
+  },
+  {
+    "name": "Andy",
+    "type": "Medical",
+    "description": "Bleeding out",
+    "latitude": 37.7749,
+    "longitude": -122.4194
+  },
+  {
+    "name": "Sawyer",
+    "type": "Food",
+    "description": "Seeking food donations for a family of 5.",
+    "latitude": 34.0522,
+    "longitude": -118.2437
+  }
+]
+
+
+
+

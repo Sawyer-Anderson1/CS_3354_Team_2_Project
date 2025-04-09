@@ -74,7 +74,7 @@ CS_3354_Team_2_Project/
 │   ├── linux/                  # Linux specific files
 │   ├── test/                   # Flutter tests
 │   └── pubspec.yaml            # Flutter dependencies
-└── README.md                   # Main project README
+└── README(unified).md          # Main project README
 ```
 
 *(Note: The root project directory is `CS_3354_Team_2_Project`.)*

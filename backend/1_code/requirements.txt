@@ -1,0 +1,22 @@
+# backend/requirements.txt
+
+fastapi                 # The web framework
+uvicorn[standard]       # ASGI server to run FastAPI
+firebase-admin          # For interacting with Firebase Firestore
+pydantic[email]         # For data validation and settings management (email extra for email validation)
+python-dotenv           # For loading environment variables (optional but good practice)
+passlib[bcrypt]         # For hashing passwords
+scikit-learn            # Dependency for matching_ai.py
+numpy                   # Dependency for matching_ai.py
+requests                # Dependency for matching_ai.py (if it makes external calls)
+geopy                   # Dependency for matching_ai.py
+joblib                  # Dependency for matching_ai.py
+
+# Placement:** This file goes into the `backend/` directory.
+
+# Action: You'll need to install these dependencies in your backend's virtual environment:
+#   bash
+#   cd backend
+#   python -m venv venv
+#   source venv/bin/activate  # On Windows use `venv\Scripts\activate`
+#   pip install -r requirements.txt

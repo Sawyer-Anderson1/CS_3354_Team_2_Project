@@ -1,0 +1,23 @@
+[
+  {
+    "name": "Casey",
+    "type": "Money",
+    "detail": "$1000"
+  },
+  {
+    "name": "Andy",
+    "type": "Money",
+    "detail": "$500"
+  },
+  {
+    "name": "Sawyer",
+    "type": "Resource",
+    "detail": "100 gallons of gas"
+  },
+  {
+    "name": "Kevin",
+    "type": "Resource",
+    "detail": "100 cases of water"
+  }
+]
+

@@ -1,0 +1,44 @@
+# =========================
+# Python
+# =========================
+venv/
+__pycache__/
+*.pyc
+
+# =========================
+# Secrets / Keys
+# =========================
+serviceAccountKey.json
+*.env
+*.secret
+
+# =========================
+# Flutter/Dart
+# =========================
+.dart_tool/
+build/
+.pub-cache/
+.packages
+
+# =========================
+# macOS / System files
+# =========================
+.DS_Store
+Thumbs.db
+
+# =========================
+# Visual Studio Code
+# =========================
+.vscode/
+
+# =========================
+# Windows specific (from windows/.gitignore)
+# =========================
+flutter/ephemeral/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+x64/
+x86/
+*.cache
