@@ -1,0 +1,23 @@
+# use the official python image as a base
+FROM python:3.9
+
+# set the working directory in the container
+WORKDIR /app
+
+# copy the requirements file first to leverage docker cache
+COPY requirements.txt .
+
+# install dependencies from requirements.txt
+# --no-cache-dir reduces image size
+RUN pip install --no-cache-dir -r requirements.txt
+
+# copy the rest of the project files to the container
+COPY . /app
+
+# expose port 8000 for fastapi
+EXPOSE 8000
+
+# command to start the fastapi app when the container runs
+# uses 0.0.0.0 to be accessible externally
+# NOTE: Update "main:app" if your entrypoint is in a subdirectory or the file is named differently
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]

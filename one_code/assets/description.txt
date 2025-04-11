@@ -1,0 +1,6 @@
+Inside json_files folder is a preset of data for each of the 5 major fucntions of the website 
+They contain data that is to be loaded onto the screens when clicked on and clicked off and on later 
+It displays the current situation of each of the systems like donations or resource inventory 
+This is just for delieverable one and for testing purposes of the webiste and how it loads data 
+This will be removed after we integrate the database and backend that we already have coded out 
+This will be integrated and implemented in project delieverable 2 

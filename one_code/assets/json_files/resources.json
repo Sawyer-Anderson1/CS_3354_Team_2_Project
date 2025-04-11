@@ -1,0 +1,33 @@
+[
+  {
+    "name": "Blankets",
+    "quantity": 50,
+    "location": "Plano, TX"
+  },
+  {
+    "name": "Water Bottles",
+    "quantity": 200,
+    "location": "Dallas, TX"
+  },
+  {
+    "name": "First Aid Kits",
+    "quantity": 30,
+    "location": "Frisco, TX"
+  } ,
+  {
+    "name": "Canned Food",
+    "quantity": 100,
+    "location": "Richardson, TX"
+  },
+  {
+    "name": "Med Units",
+    "quantity": 25,
+    "location": "Wylie, TX"
+  },
+  {
+    "name": "Gas (Gallons)",
+    "quantity": 40,
+    "location": "Garland, TX"
+  }
+]
+  
