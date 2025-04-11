@@ -1,6 +1,7 @@
 // main dart just sends to the homescreen UI 
 // sets the theme and calls the homescreen class 
 // starting point is homescreen and everything after that will be in the home screen 
+// This is what starts it all
 
 import 'package:flutter/material.dart';
 import 'screens/home_screen.dart'; // Import the HomeScreen
