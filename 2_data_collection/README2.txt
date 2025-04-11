@@ -1,7 +1,7 @@
 Overview:
 This module provides a script to populate your Firebase Firestore database with sample data. 
 This sample data is used for testing and to demonstrate the AI-powered matching functionality by providing volunteer profiles and 
-disaster aid requests.
+disaster aid requests. This is are 2_data_collection
 
 Prerequisites:
   1. Firebase Credentials:
