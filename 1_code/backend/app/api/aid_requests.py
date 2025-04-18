@@ -7,7 +7,7 @@ from database import get_db
 import models
 import schemas
 from auth import get_current_active_user
-from matching import find_matching_volunteers
+from matching_ai import find_matching_volunteers
 
 router = APIRouter(
     prefix="/aid-requests",
