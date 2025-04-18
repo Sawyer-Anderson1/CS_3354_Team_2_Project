@@ -1,9 +1,81 @@
-fastapi
-uvicorn[standard]
-firebase-admin
-scikit-learn
-numpy
-requests
-geopy
-joblib
-pytest
+fastapi==0.104.1
+uvicorn==0.24.0
+sqlalchemy==2.0.23
+psycopg2-binary==2.9.9
+pydantic==2.5.2
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+python-multipart==0.0.6
+websockets==12.0
+scikit-learn==1.3.2
+numpy==1.26.2
+pandas==2.1.3
+python-dotenv==1.0.0
+pytest==7.4.3
+httpx==0.25.2
+alembic==1.12.1 
+
+# description of the requirements:
+#FastAPI (0.104.1)
+#    A modern, fast web framework for building APIs with Python
+#    Used as the main backend framework for creating RESTful APIs and web services
+#Uvicorn (0.24.0)
+#    An ASGI server implementation
+#    Used to run the FastAPI application in production
+#    Handles the actual serving of the web application
+#SQLAlchemy (2.0.23)
+#    A SQL toolkit and ORM (Object-Relational Mapping) library
+#    Used for database operations and managing database models
+#    Helps interact with the database in a Pythonic way
+#psycopg2-binary (2.9.9)
+#    PostgreSQL adapter
+#    Allows Python to connect to and interact with PostgreSQL databases
+#    Required for SQLAlchemy to work with PostgreSQL
+#Pydantic (2.5.2)
+#    Data validation library using Python type annotations
+#    Used for data validation and settings management
+#    Helps ensure data integrity in the application
+#python-jose[cryptography] (3.3.0)
+#    Library for handling JSON Web Tokens (JWT)
+#    Used for authentication and authorization
+#    The cryptography extra provides additional security features
+#passlib[bcrypt] (1.7.4)
+#    Password hashing library
+#    Used for securely storing and verifying passwords
+#    bcrypt is a secure password hashing algorithm
+#python-multipart (0.0.6)
+#    Library for handling form data
+#    Used for processing file uploads and form submissions
+#    Required for handling multipart form data in FastAPI
+#websockets (12.0)
+#    Library for WebSocket support
+#    Enables real-time bidirectional communication
+#    Used for features requiring live updates or chat functionality
+#scikit-learn (1.3.2)
+#    Machine learning library
+#    Used for implementing machine learning algorithms
+#    Suggests the application has some ML/AI features
+#numpy (1.26.2)
+#    Numerical computing library
+#    Used for mathematical operations and array handling
+#    Often used in conjunction with scikit-learn
+#pandas (2.1.3)
+#    Data manipulation and analysis library
+#    Used for handling structured data
+#    Useful for data processing and analysis
+#python-dotenv (1.0.0)
+#    Library for loading environment variables
+#    Used for configuration management
+#    Helps manage sensitive information like API keys and database credentials
+#pytest (7.4.3)
+#    Testing framework
+#    Used for writing and running tests
+#    Ensures code quality and reliability
+#httpx (0.25.2)
+#    Modern HTTP client
+#    Used for making HTTP requests
+#    Useful for testing and making external API calls
+#alembic (1.12.1)
+#    Database migration tool
+#    Used for managing database schema changes
+#    Works with SQLAlchemy to handle database versioning
