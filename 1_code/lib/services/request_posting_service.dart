@@ -9,7 +9,7 @@ final List<Request> _currentRequests = [];
 
 Future<List<Request>> fetchCurrentRequests() async {
   try {
-    final String response = await rootBundle.loadString('assets/current_requests.json');
+    final String response = await rootBundle.loadString('assets/json_files/current_requests.json');
     final List<dynamic> data = jsonDecode(response);
     _currentRequests.clear();
     _currentRequests.addAll(data.map((json) => Request.fromJson(json)));

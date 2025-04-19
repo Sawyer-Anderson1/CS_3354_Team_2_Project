@@ -6,7 +6,7 @@ import '../models/donation.dart';
 
 Future<List<Donation>> fetchDonations() async {
   try {
-    final String response = await rootBundle.loadString('assets/donations.json');
+    final String response = await rootBundle.loadString('assets/json_files/donations.json');
     final List<dynamic> data = jsonDecode(response);
     return data.map((json) => Donation.fromJson(json)).toList();
   } catch (e) {

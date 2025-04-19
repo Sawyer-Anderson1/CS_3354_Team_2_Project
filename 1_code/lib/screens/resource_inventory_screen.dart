@@ -1,4 +1,9 @@
 // UI to update resource inventory
+// Creates a basics screen and imports the model and service darts for this specific function
+// Displays the current resources in your area 
+// Will be soon updated for deliverable 2 to display all resources, even resources with 0 in your area 
+// Will be able to integrate with updating data after a donation has been made for deliverable 2
+
 import 'package:flutter/material.dart';
 import '../models/resource.dart';
 // ignore: library_prefixes

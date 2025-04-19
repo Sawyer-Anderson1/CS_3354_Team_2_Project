@@ -1,4 +1,7 @@
 // UI for donation screen
+// Creates a basics screen and imports the model and service darts for this specific function
+// Asks the user for its name, type of donation, and description of the donation 
+
 import 'package:flutter/material.dart';
 import '../models/donation.dart';
 import '../services/donation_service.dart';
@@ -13,6 +16,8 @@ class DonationScreen extends StatefulWidget {
 class _DonationScreenState extends State<DonationScreen> {
   final _formKey = GlobalKey<FormState>();
   final List<Donation> _donations = [];
+  final TextEditingController _detailController = TextEditingController();
+
   String _name = '';
   String _type = 'Money';
   String _detail = '';
@@ -21,6 +26,13 @@ class _DonationScreenState extends State<DonationScreen> {
   void initState() {
     super.initState();
     _loadDonations();
+    _detailController.text = '\$'; // Start with $ by default since default type is Money
+  }
+
+  @override
+  void dispose() {
+    _detailController.dispose();
+    super.dispose();
   }
 
   void _loadDonations() async {
@@ -33,6 +45,8 @@ class _DonationScreenState extends State<DonationScreen> {
   void _submitDonation() {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
+      _detail = _detailController.text;
+
       final newDonation = Donation(name: _name, type: _type, detail: _detail);
 
       setState(() {
@@ -47,7 +61,22 @@ class _DonationScreenState extends State<DonationScreen> {
 
       _formKey.currentState!.reset();
       _type = 'Money';
+      _detailController.text = '\$';
     }
+  }
+
+  void _handleTypeChange(String? newType) {
+    if (newType == null) return;
+    setState(() {
+      _type = newType;
+      if (_type == 'Money') {
+        if (!_detailController.text.startsWith('\$')) {
+          _detailController.text = '\$';
+        }
+      } else {
+        _detailController.clear();
+      }
+    });
   }
 
   @override
@@ -56,11 +85,7 @@ class _DonationScreenState extends State<DonationScreen> {
       appBar: AppBar(
         title: const Text(
           'Make a Donation',
-          style: TextStyle(
-            fontSize: 26, // Set text size to 26
-            fontWeight: FontWeight.bold, // Make the text bold
-            color: Colors.black, // Set text color to black
-          ),
+          style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold, color: Colors.black),
         ),
       ),
       body: Padding(
@@ -82,21 +107,23 @@ class _DonationScreenState extends State<DonationScreen> {
                     items: ['Money', 'Resource'].map((type) {
                       return DropdownMenuItem(value: type, child: Text(type));
                     }).toList(),
-                    onChanged: (value) => setState(() => _type = value!),
+                    onChanged: _handleTypeChange,
                     decoration: const InputDecoration(labelText: "Donation Type"),
                   ),
                   const SizedBox(height: 10),
                   TextFormField(
+                    controller: _detailController,
                     decoration: const InputDecoration(labelText: "Amount / Description"),
                     validator: (value) => value == null || value.isEmpty ? "Enter a description" : null,
-                    onSaved: (value) => _detail = value!,
                   ),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 20),
                   ElevatedButton(
+                    onPressed: _submitDonation,
                     // ignore: sort_child_properties_last
-                    onPressed: _submitDonation, child: const Text("Donate") ,
+                    child: const Text("Donate"),
                     style: ElevatedButton.styleFrom(
-                      foregroundColor: Colors.white, backgroundColor: Colors.green, // Set text color to white
+                      foregroundColor: Colors.white,
+                      backgroundColor: Colors.green,
                     ),
                   ),
                 ],

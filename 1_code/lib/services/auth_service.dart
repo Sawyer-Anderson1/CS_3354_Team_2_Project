@@ -4,7 +4,7 @@ import 'package:http/http.dart' as http;
 import '../models/user.dart';
 
 class AuthService {
-  static const String _apiUrl = 'https://example.com/api'; // Replace with your actual API URL
+  static const String _apiUrl = 'https://example.com/api'; // Replace with  actual API URL
 
   // Sign up user
   Future<bool> signUp(User user) async {

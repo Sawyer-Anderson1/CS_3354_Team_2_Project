@@ -1,4 +1,10 @@
 // UI for emergency alerts 
+// Creates a basics screen and imports the model and service darts for this specific function
+// displays emergency alerts 
+// takes in the json data that is preloaded for delieverable 1 
+// in deliberable 2, will implemented a rotating emergency alerts that is randomized and displayed 
+// will be updated to stay on while emergency is active and for ones that are outdated/ dealt with, will say so
+
 import 'package:flutter/material.dart';
 import '../models/alert.dart';
 import '../services/emergency_alert_service.dart';
@@ -24,12 +30,15 @@ class _EmergencyAlertsScreenState extends State<EmergencyAlertsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Emergency Alerts',
-          style: TextStyle(
-            fontSize: 26, // Larger text size
-            fontWeight: FontWeight.bold, // Make the text bold
-            color: Colors.black, // Set text color to black
+        title: Padding(
+          padding: const EdgeInsets.only(top: 16), // Added space above the title
+          child: const Text(
+            'Emergency Alerts',
+            style: TextStyle(
+              fontSize: 26, // Larger text size
+              fontWeight: FontWeight.bold, // Make the text bold
+              color: Colors.black, // Set text color to black
+            ),
           ),
         ),
       ),
@@ -52,7 +61,12 @@ class _EmergencyAlertsScreenState extends State<EmergencyAlertsScreen> {
               final alert = alertsList[index];
               return ListTile(
                 title: Text(alert.alertTitle),
-                subtitle: Text("${alert.alertDescription}\nDate: ${alert.alertDate}"),
+                subtitle: Text(
+                  "${alert.alertDescription}\nLocation: ${alert.alertLocation} \nDate: ${alert.alertDate}",
+                  style: const TextStyle(fontSize: 14), // Adjust subtitle text size
+                  maxLines: 3, // Limit subtitle to 3 lines
+                  overflow: TextOverflow.ellipsis, // Handle overflow gracefully
+                ),
               );
             },
           );
@@ -61,4 +75,3 @@ class _EmergencyAlertsScreenState extends State<EmergencyAlertsScreen> {
     );
   }
 }
-

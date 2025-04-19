@@ -4,7 +4,7 @@ import '../models/resource.dart';
 
 Future<List<Resource>> fetchResources() async {
   try {
-    final String response = await rootBundle.loadString('assets/resources.json');
+    final String response = await rootBundle.loadString('assets/json_files/resources.json');
     final data = jsonDecode(response);
     
     // ignore: avoid_print

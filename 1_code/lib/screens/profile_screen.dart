@@ -1,4 +1,11 @@
 // UI for signup / sign in 
+// Creates a basics screen and imports the model and service darts for this specific function
+// toggles between sign in and sign out 
+// user enters email and password
+// not integrated yet for data storage in the backend so user will get an error message after signing in
+// will be integrated with database and backend for deliverable 2 
+// this screen simply lays the groundwork for user sign in and sign out 
+
 import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
 import '../models/user.dart';

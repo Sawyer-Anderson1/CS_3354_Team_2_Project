@@ -1,4 +1,7 @@
-// getting info from json file 
+// sets the model for a user request 
+// takes in 5 variables as define in the Request class 
+// this allows for data handling locally and in the database 
+
 class Request {
   final String name;
   final String type;

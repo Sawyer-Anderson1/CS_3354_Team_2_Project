@@ -1,4 +1,7 @@
-// getting info from json file 
+// sets the model for the user auth system
+// takes an email and password 
+// also converts user data that has been stored 
+// this is good for the database and local data storage 
 class User {
   final String email;
   final String password;

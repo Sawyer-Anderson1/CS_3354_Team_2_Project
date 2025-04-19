@@ -1,4 +1,6 @@
-// gettng info from json file 
+// sets the model for the current resource inventory 
+// takes the three variables as defined in the Resource class 
+// for database and local data storage 
 class Resource {
   final String name;
   final int quantity;
