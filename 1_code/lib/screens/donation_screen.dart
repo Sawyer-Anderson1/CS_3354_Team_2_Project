@@ -1,6 +1,6 @@
 // UI for donation screen
 // Creates a basics screen and imports the model and service darts for this specific function
-// Asks the user for its name, type of donation, and description of the donation 
+// Asks the user for its name, type of donation, and description of the donation
 
 import 'package:flutter/material.dart';
 import '../models/donation.dart';
@@ -26,7 +26,8 @@ class _DonationScreenState extends State<DonationScreen> {
   void initState() {
     super.initState();
     _loadDonations();
-    _detailController.text = '\$'; // Start with $ by default since default type is Money
+    _detailController.text =
+        '\$'; // Start with $ by default since default type is Money
   }
 
   @override
@@ -54,9 +55,7 @@ class _DonationScreenState extends State<DonationScreen> {
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Thanks $_name for donating $_detail ($_type)'),
-        ),
+        SnackBar(content: Text('Thanks $_name for donating $_detail ($_type)')),
       );
 
       _formKey.currentState!.reset();
@@ -85,7 +84,11 @@ class _DonationScreenState extends State<DonationScreen> {
       appBar: AppBar(
         title: const Text(
           'Make a Donation',
-          style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold, color: Colors.black),
+          style: TextStyle(
+            fontSize: 26,
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
+          ),
         ),
       ),
       body: Padding(
@@ -95,55 +98,132 @@ class _DonationScreenState extends State<DonationScreen> {
             Form(
               key: _formKey,
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  const SizedBox(height: 10),
                   TextFormField(
-                    decoration: const InputDecoration(labelText: "Your Name"),
-                    validator: (value) => value == null || value.isEmpty ? "Enter your name" : null,
+                    decoration: InputDecoration(
+                      labelText: "Your Name",
+                      filled: true,
+                      fillColor: Colors.white,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    validator:
+                        (value) =>
+                            value == null || value.isEmpty
+                                ? "Enter your name"
+                                : null,
                     onSaved: (value) => _name = value!,
                   ),
-                  const SizedBox(height: 10),
-                  DropdownButtonFormField<String>(
-                    value: _type,
-                    items: ['Money', 'Resource'].map((type) {
-                      return DropdownMenuItem(value: type, child: Text(type));
-                    }).toList(),
-                    onChanged: _handleTypeChange,
-                    decoration: const InputDecoration(labelText: "Donation Type"),
+                  const SizedBox(height: 16),
+                  const Text("Donation Type", style: TextStyle(fontSize: 16)),
+                  const SizedBox(height: 8),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      for (var type in ['Money', 'Resource'])
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 6),
+                            child: ChoiceChip(
+                              label: Center(child: Text(type)),
+                              selected: _type == type,
+                              onSelected: (_) => _handleTypeChange(type),
+                              selectedColor: Colors.deepPurple,
+                              backgroundColor: Colors.grey.shade200,
+                              labelStyle: TextStyle(
+                                color:
+                                    _type == type ? Colors.white : Colors.black,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
+                          ),
+                        ),
+                    ],
                   ),
-                  const SizedBox(height: 10),
+
+                  const SizedBox(height: 16),
                   TextFormField(
                     controller: _detailController,
-                    decoration: const InputDecoration(labelText: "Amount / Description"),
-                    validator: (value) => value == null || value.isEmpty ? "Enter a description" : null,
+                    decoration: InputDecoration(
+                      labelText: "Amount / Description",
+                      filled: true,
+                      fillColor: Colors.white,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    validator:
+                        (value) =>
+                            value == null || value.isEmpty
+                                ? "Enter a description"
+                                : null,
                   ),
                   const SizedBox(height: 20),
-                  ElevatedButton(
-                    onPressed: _submitDonation,
-                    // ignore: sort_child_properties_last
-                    child: const Text("Donate"),
-                    style: ElevatedButton.styleFrom(
-                      foregroundColor: Colors.white,
-                      backgroundColor: Colors.green,
+                  Center(
+                    child: ElevatedButton.icon(
+                      onPressed: _submitDonation,
+                      icon: const Icon(Icons.favorite),
+                      label: const Text("Donate"),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green.shade600,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 28,
+                          vertical: 14,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
                     ),
                   ),
                 ],
               ),
             ),
+
             const SizedBox(height: 20),
             const Divider(),
-            const Text("All Donations:", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            const Text(
+              "All Donations:",
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
             Expanded(
-              child: ListView.builder(
-                itemCount: _donations.length,
-                itemBuilder: (context, index) {
-                  final d = _donations[index];
-                  return ListTile(
-                    leading: const Icon(Icons.volunteer_activism),
-                    title: Text("${d.name} donated ${d.detail}"),
-                    subtitle: Text(d.type),
-                  );
-                },
-              ),
+              child:
+                  _donations.isEmpty
+                      ? const Center(child: Text("No donations yet."))
+                      : ListView.builder(
+                        padding: const EdgeInsets.only(top: 10),
+                        itemCount: _donations.length,
+                        itemBuilder: (context, index) {
+                          final d = _donations[index];
+                          return Card(
+                            margin: const EdgeInsets.symmetric(vertical: 6),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            elevation: 2,
+                            child: ListTile(
+                              leading: const Icon(
+                                Icons.volunteer_activism,
+                                color: Colors.deepPurple,
+                              ),
+                              title: Text(
+                                "${d.name} donated ${d.detail}",
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              subtitle: Text(d.type),
+                            ),
+                          );
+                        },
+                      ),
             ),
           ],
         ),
