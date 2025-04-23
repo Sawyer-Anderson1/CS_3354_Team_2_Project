@@ -22,7 +22,7 @@
 #   - Run "make run-all" to launch both the backend at http://127.0.0.1:8001/match/101 
 #     and the Flutter frontend at http://localhost:55242/.
 
-.PHONY: run setup test docker-up docker-down clean populate-db run-all
+.PHONY: run setup test docker-up docker-down clean populate-db run-all lint format check-deps
 
 # Path to the virtual environment directory
 VENV_DIR=code_1/backend/venv
@@ -30,37 +30,57 @@ VENV_DIR=code_1/backend/venv
 # Command to activate the virtual environment
 ACTIVATE=. $(VENV_DIR)/bin/activate;
 
-# FastAPI app entry point: APP=code_1/backend/main.py
-
-# Path to the requirements file
+# Paths
 REQS=code_1/backend/requirements.txt
+SERVICE_KEY=code_1/backend/serviceAccountKey.json
+BACKEND_PORT=8000
 
-# Path to the Flutter executable
+# Check for required executables
+PYTHON := $(shell command -v python3 2>/dev/null)
 FLUTTER_BIN := $(shell command -v flutter 2>/dev/null)
+DOCKER := $(shell command -v docker 2>/dev/null)
+
+# Check dependencies
+check-deps:
+ifndef PYTHON
+	$(error ❌ Python3 not found. Please install Python 3.x)
+endif
 ifndef FLUTTER_BIN
-$(error ❌ Flutter executable not found in PATH. Please ensure Flutter is installed and added to PATH.)
+	$(error ❌ Flutter not found. Please install Flutter and add to PATH)
+endif
+ifndef DOCKER
+	$(error ❌ Docker not found. Please install Docker)
 endif
 
-# Default target: run the FastAPI server with the service account environment variable set.
-run:
-	GOOGLE_APPLICATION_CREDENTIALS=code_1/backend/serviceAccountKey.json $(ACTIVATE) uvicorn code_1.backend.main:app --reload --port 8001
+# Check for service account key
+check-service-key:
+	@if [ ! -f $(SERVICE_KEY) ]; then \
+		echo "❌ Firebase service account key not found at $(SERVICE_KEY)"; \
+		echo "Please place your serviceAccountKey.json in the code_1/backend/ directory"; \
+		exit 1; \
+	fi
 
-# One-time setup: create the virtual environment & install dependencies
-setup:
+# Default target: run the FastAPI server
+run: check-deps check-service-key
+	GOOGLE_APPLICATION_CREDENTIALS=$(SERVICE_KEY) $(ACTIVATE) uvicorn code_1.backend.main:app --reload --port $(BACKEND_PORT)
+
+# One-time setup: create virtual environment & install dependencies
+setup: check-deps
 	python3 -m venv $(VENV_DIR)
 	$(ACTIVATE) pip install --upgrade pip
 	$(ACTIVATE) pip install -r $(REQS)
+	$(ACTIVATE) pip install black flake8 pytest pytest-cov
 
-# Run unit tests with pytest
-test:
-	$(ACTIVATE) pytest 3_basic_function_testing/test_matching.py
+# Run unit tests with pytest and coverage
+test: check-deps
+	$(ACTIVATE) pytest 3_basic_function_testing/test_matching.py --cov=code_1/backend --cov-report=term-missing
 
 # Populate Firestore with sample data
-populate-db:
-	GOOGLE_APPLICATION_CREDENTIALS=code_1/backend/serviceAccountKey.json $(ACTIVATE) python 2_data_collection/populate_database.py
+populate-db: check-deps check-service-key
+	GOOGLE_APPLICATION_CREDENTIALS=$(SERVICE_KEY) $(ACTIVATE) python 2_data_collection/populate_database.py
 
-# Build and run Docker containers with the Compose file in code_1/
-docker-up:
+# Build and run Docker containers
+docker-up: check-deps check-service-key
 	@docker info > /dev/null 2>&1 || (\
 		echo "❌ Docker daemon is not running. Please start Docker Desktop first."; \
 		exit 1; \
@@ -71,18 +91,45 @@ docker-up:
 docker-down:
 	docker compose -f code_1/backend/docker-compose.yml down --remove-orphans
 
-# Clean up Python __pycache__ directories
+# Clean up Python cache and build artifacts
 clean:
 	find . -type d -name '__pycache__' -exec rm -r {} +
+	find . -type d -name '.pytest_cache' -exec rm -r {} +
+	find . -type d -name '.coverage' -exec rm -r {} +
+	find . -type f -name '*.pyc' -delete
 
-# New target to run both backend and frontend
+# Format code with black
+format: check-deps
+	$(ACTIVATE) black code_1/backend/
+
+# Lint code with flake8
+lint: check-deps
+	$(ACTIVATE) flake8 code_1/backend/
+
+# Run both backend and frontend
 run-all: setup populate-db
 	@echo "Starting backend server..."
-	# Run the backend in the background so that the terminal is free for Flutter
-	( $(MAKE) run & )
+	@$(MAKE) run & 
 	@echo "Waiting for backend to be ready..."
-	@while ! nc -z 127.0.0.1 8001; do sleep 1; done
+	@timeout 30 sh -c 'until curl -s http://localhost:$(BACKEND_PORT)/health; do sleep 1; done' || (\
+		echo "❌ Backend failed to start within 30 seconds"; \
+		exit 1; \
+	)
 	@echo "Backend is ready."
 	@echo "Starting Flutter frontend..."
-	# Change directory to code_1 and run the Flutter app
 	cd code_1 && $(FLUTTER_BIN) run lib/main.dart
+
+# Show help
+help:
+	@echo "Available targets:"
+	@echo "  setup        - Set up virtual environment and install dependencies"
+	@echo "  run          - Run the FastAPI backend server"
+	@echo "  test         - Run unit tests with coverage"
+	@echo "  lint         - Check code style with flake8"
+	@echo "  format       - Format code with black"
+	@echo "  populate-db  - Load sample data into Firestore"
+	@echo "  docker-up    - Build and run Docker containers"
+	@echo "  docker-down  - Stop and remove Docker containers"
+	@echo "  clean        - Remove Python cache and build artifacts"
+	@echo "  run-all     - Run both backend and frontend"
+	@echo "  help         - Show this help message"
