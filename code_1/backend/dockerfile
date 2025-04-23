@@ -1,23 +1,52 @@
-# use the official python image as a base
-FROM python:3.9
+# Build stage
+FROM python:3.11-slim as builder
 
-# set the working directory in the container
+# Install build dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create a non-root user
+RUN useradd -m -u 1000 appuser
+
+# Set the working directory
 WORKDIR /app
 
-# copy the requirements file first to leverage docker cache
+# Copy only the requirements file first
 COPY requirements.txt .
 
-# install dependencies from requirements.txt
-# --no-cache-dir reduces image size
+# Install dependencies into a virtual environment
+RUN python -m venv /app/venv
+ENV PATH="/app/venv/bin:$PATH"
 RUN pip install --no-cache-dir -r requirements.txt
 
-# copy the rest of the project files to the container
-COPY . /app
+# Final stage
+FROM python:3.11-slim
 
-# expose port 8000 for fastapi
+# Copy the virtual environment from builder
+COPY --from=builder /app/venv /app/venv
+
+# Create and switch to non-root user
+COPY --from=builder /etc/passwd /etc/passwd
+USER appuser
+
+# Set environment variables
+ENV PATH="/app/venv/bin:$PATH" \
+    PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1
+
+# Set the working directory
+WORKDIR /app
+
+# Copy the application code
+COPY --chown=appuser:appuser . .
+
+# Expose port 8000 for fastapi
 EXPOSE 8000
 
-# command to start the fastapi app when the container runs
-# uses 0.0.0.0 to be accessible externally
-# NOTE: Update "main:app" if your entrypoint is in a subdirectory or the file is named differently
+# Health check
+HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:8000/health || exit 1
+
+# Command to start the fastapi app
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]

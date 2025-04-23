@@ -6,116 +6,211 @@ from sklearn.preprocessing import OneHotEncoder, StandardScaler
 import joblib  # For persistence (if needed in the future)
 from geopy.geocoders import Nominatim
 from geopy.exc import GeocoderTimedOut, GeocoderServiceError
+from typing import List, Dict, Any, Tuple
+import logging
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 # Configuration and Encoder Setup
-KNOWN_SKILLS = ['Medical', 'Food Logistics', 'Rescue', 'Shelter Management', 'Transportation', 'Communication', 'General Labor']
+KNOWN_SKILLS = ['Medical', 'Food Logistics', 'Rescue', 'Shelter Management', 
+                'Transportation', 'Communication', 'General Labor', 'Technical Support',
+                'Psychological Support', 'Language Translation']
 
-encoder = OneHotEncoder(categories=[KNOWN_SKILLS], sparse_output=False, handle_unknown='ignore')
-encoder.fit(np.array(KNOWN_SKILLS).reshape(-1, 1))
+REQUEST_TYPES = ['Medical', 'Food', 'Shelter', 'Rescue', 'Transport', 'Communication',
+                'Technical', 'Psychological', 'Translation', 'Other']
 
-# Initialize global scaler (if needed) and geolocator
-global_scaler = StandardScaler()  # Not used globally, as each matching gets its own scaler.
-geolocator = Nominatim(user_agent="disaster_matching_ai")
+URGENCY_LEVELS = ['low', 'medium', 'high', 'critical']
 
-# Geocoding Function
-def get_lat_long(address):
+encoder_skills = OneHotEncoder(categories=[KNOWN_SKILLS], sparse_output=False, handle_unknown='ignore')
+encoder_skills.fit(np.array(KNOWN_SKILLS).reshape(-1, 1))
+
+encoder_types = OneHotEncoder(categories=[REQUEST_TYPES], sparse_output=False, handle_unknown='ignore')
+encoder_types.fit(np.array(REQUEST_TYPES).reshape(-1, 1))
+
+# Initialize geolocator with better error handling
+geolocator = Nominatim(user_agent="disaster_matching_ai", timeout=10)
+
+def get_lat_long(address: str) -> Tuple[float, float]:
     """
-    Convert an address string to a (latitude, longitude) tuple.
+    Convert an address string to a (latitude, longitude) tuple with improved error handling.
     Returns (0.0, 0.0) if the address cannot be resolved.
     """
     try:
-        location = geolocator.geocode(address, timeout=10)
+        location = geolocator.geocode(address)
         if location:
             return location.latitude, location.longitude
-    except (GeocoderTimedOut, GeocoderServiceError):
-        pass
+        logger.warning(f"Could not geocode address: {address}")
+    except (GeocoderTimedOut, GeocoderServiceError) as e:
+        logger.error(f"Geocoding error for address {address}: {str(e)}")
     return (0.0, 0.0)
 
-# Feature Extraction Functions
-def extract_features_request(request_data):
+def calculate_distance(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
     """
-    Extract features from an aid request.
-    Expected keys: 'type', 'location', 'urgency'
-    Returns: [latitude, longitude] + one-hot encoded type + [urgency_score]
+    Calculate the Haversine distance between two points in kilometers.
     """
-    req_type = request_data.get('type', '')
-    encoded_type = encoder.transform([[req_type]])[0]
-    lat, lon = get_lat_long(request_data.get('location', ''))
-    urgency_mapping = {"low": 1, "medium": 2, "high": 3}
-    urgency_score = urgency_mapping.get(request_data.get('urgency', 'low'), 1)
-    return np.concatenate(([lat, lon], encoded_type, [urgency_score]))
+    R = 6371  # Earth's radius in kilometers
+    lat1, lon1, lat2, lon2 = map(np.radians, [lat1, lon1, lat2, lon2])
+    dlat = lat2 - lat1
+    dlon = lon2 - lon1
+    a = np.sin(dlat/2)**2 + np.cos(lat1) * np.cos(lat2) * np.sin(dlon/2)**2
+    c = 2 * np.arcsin(np.sqrt(a))
+    return R * c
 
-def extract_features_volunteer(volunteer_data):
+def extract_features_request(request_data: Dict[str, Any]) -> np.ndarray:
     """
-    Extract features from a volunteer.
-    Expected keys: 'skills', 'location', 'availability'
-    Returns: [latitude, longitude] + one-hot encoded skill + [availability_flag]
+    Enhanced feature extraction from an aid request.
+    Includes type, location, urgency, and additional metadata.
     """
-    v_skill = volunteer_data.get('skills', '')
-    encoded_skill = encoder.transform([[v_skill]])[0]
-    lat, lon = get_lat_long(volunteer_data.get('location', ''))
-    availability = 1 if volunteer_data.get('availability', 'available').lower() == 'available' else 0
-    return np.concatenate(([lat, lon], encoded_skill, [availability]))
+    try:
+        req_type = request_data.get('type', '')
+        encoded_type = encoder_types.transform([[req_type]])[0]
+        
+        lat, lon = get_lat_long(request_data.get('location', ''))
+        
+        urgency_mapping = {level: idx+1 for idx, level in enumerate(URGENCY_LEVELS)}
+        urgency_score = urgency_mapping.get(request_data.get('urgency', 'low'), 1)
+        
+        # Additional features
+        timestamp = request_data.get('timestamp', 0)
+        num_people = request_data.get('num_people', 1)
+        
+        return np.concatenate((
+            [lat, lon],
+            encoded_type,
+            [urgency_score, timestamp, num_people]
+        ))
+    except Exception as e:
+        logger.error(f"Error extracting request features: {str(e)}")
+        raise
 
-# Matching Functions
-def build_feature_matrix(volunteers):
+def extract_features_volunteer(volunteer_data: Dict[str, Any]) -> np.ndarray:
     """
-    Build a feature matrix from a list of volunteer dictionaries.
-    Each row represents one volunteer's feature vector.
+    Enhanced feature extraction from a volunteer profile.
+    Includes skills, location, availability, and additional metadata.
     """
-    features = [extract_features_volunteer(vol) for vol in volunteers]
-    return np.vstack(features)
+    try:
+        skills = volunteer_data.get('skills', [])
+        encoded_skills = np.zeros(len(KNOWN_SKILLS))
+        for skill in skills:
+            if skill in KNOWN_SKILLS:
+                idx = KNOWN_SKILLS.index(skill)
+                encoded_skills[idx] = 1
+        
+        lat, lon = get_lat_long(volunteer_data.get('location', ''))
+        
+        availability = 1 if volunteer_data.get('availability', False) else 0
+        experience = volunteer_data.get('experience_years', 0)
+        rating = volunteer_data.get('rating', 0)
+        
+        return np.concatenate((
+            [lat, lon],
+            encoded_skills,
+            [availability, experience, rating]
+        ))
+    except Exception as e:
+        logger.error(f"Error extracting volunteer features: {str(e)}")
+        raise
 
-def get_best_matches(request_features, volunteers, k=3):
+def build_feature_matrix(volunteers: List[Dict[str, Any]]) -> np.ndarray:
     """
-    Production function: Uses KNN to find the top k matching volunteers.
-    Returns a list of volunteer dictionaries for the best matches.
+    Build a feature matrix from a list of volunteer dictionaries with error handling.
     """
-    if not volunteers:
-        return []
-    X = build_feature_matrix(volunteers)
-    scaler_local = StandardScaler()
-    X_scaled = scaler_local.fit_transform(X)
-    req_scaled = scaler_local.transform([request_features])
-    nn = NearestNeighbors(n_neighbors=min(k, len(volunteers)), metric='euclidean')
-    nn.fit(X_scaled)
-    distances, indices = nn.kneighbors(req_scaled)
-    matches = [volunteers[i] for i in indices[0]]
-    return matches
+    try:
+        features = [extract_features_volunteer(vol) for vol in volunteers]
+        return np.vstack(features)
+    except Exception as e:
+        logger.error(f"Error building feature matrix: {str(e)}")
+        raise
 
-def get_best_matches_debug(request_features, volunteers, k=3):
+def get_best_matches(request_features: np.ndarray, volunteers: List[Dict[str, Any]], 
+                    k: int = 3, max_distance: float = 50.0) -> List[Dict[str, Any]]:
     """
-    Debug function: Similar to get_best_matches, but returns detailed matching info.
-    Returns a dictionary with:
-      - Raw request feature vector.
-      - Volunteer feature matrix.
-      - Scaled feature matrix.
-      - Scaled request vector.
-      - Distances and indices from KNN.
-      - Final matched volunteer dictionaries.
+    Enhanced matching function with distance constraints and better error handling.
     """
-    if not volunteers:
+    try:
+        if not volunteers:
+            return []
+            
+        X = build_feature_matrix(volunteers)
+        scaler = StandardScaler()
+        X_scaled = scaler.fit_transform(X)
+        req_scaled = scaler.transform([request_features])
+        
+        nn = NearestNeighbors(n_neighbors=min(k, len(volunteers)), metric='euclidean')
+        nn.fit(X_scaled)
+        distances, indices = nn.kneighbors(req_scaled)
+        
+        # Filter by distance and create matches
+        matches = []
+        for dist, idx in zip(distances[0], indices[0]):
+            volunteer = volunteers[idx]
+            req_lat, req_lon = request_features[0], request_features[1]
+            vol_lat, vol_lon = X[idx][0], X[idx][1]
+            
+            actual_distance = calculate_distance(req_lat, req_lon, vol_lat, vol_lon)
+            if actual_distance <= max_distance:
+                matches.append({
+                    'volunteer': volunteer,
+                    'distance_km': actual_distance,
+                    'matching_score': 1 / (1 + dist)  # Normalized matching score
+                })
+        
+        return sorted(matches, key=lambda x: x['matching_score'], reverse=True)
+        
+    except Exception as e:
+        logger.error(f"Error in matching process: {str(e)}")
+        raise
+
+def get_best_matches_debug(request_features: np.ndarray, volunteers: List[Dict[str, Any]], 
+                          k: int = 3) -> Dict[str, Any]:
+    """
+    Debug function with detailed matching information and error handling.
+    """
+    try:
+        if not volunteers:
+            return {
+                "message": "No volunteers available",
+                "matched_volunteers": []
+            }
+            
+        X = build_feature_matrix(volunteers)
+        scaler = StandardScaler()
+        X_scaled = scaler.fit_transform(X)
+        req_scaled = scaler.transform([request_features])
+        
+        nn = NearestNeighbors(n_neighbors=min(k, len(volunteers)), metric='euclidean')
+        nn.fit(X_scaled)
+        distances, indices = nn.kneighbors(req_scaled)
+        
+        matches = []
+        for dist, idx in zip(distances[0], indices[0]):
+            volunteer = volunteers[idx]
+            req_lat, req_lon = request_features[0], request_features[1]
+            vol_lat, vol_lon = X[idx][0], X[idx][1]
+            actual_distance = calculate_distance(req_lat, req_lon, vol_lat, vol_lon)
+            
+            matches.append({
+                'volunteer': volunteer,
+                'distance_km': actual_distance,
+                'matching_score': 1 / (1 + dist),
+                'feature_vector': X[idx].tolist()
+            })
+        
         return {
-            "message": "No volunteers available",
-            "matched_volunteers": []
+            "request_features": request_features.tolist(),
+            "volunteer_features": X.tolist(),
+            "X_scaled": X_scaled.tolist(),
+            "req_scaled": req_scaled[0].tolist(),
+            "distances": distances[0].tolist(),
+            "indices": indices[0].tolist(),
+            "matched_volunteers": matches
         }
-    X = build_feature_matrix(volunteers)
-    from sklearn.preprocessing import StandardScaler
-    scaler_local = StandardScaler()
-    X_scaled = scaler_local.fit_transform(X)
-    req_scaled = scaler_local.transform([request_features])
-    nn = NearestNeighbors(n_neighbors=min(k, len(volunteers)), metric='euclidean')
-    nn.fit(X_scaled)
-    distances, indices = nn.kneighbors(req_scaled)
-    distances_list = distances[0].tolist()
-    indices_list = indices[0].tolist()
-    matched_vols = [volunteers[i] for i in indices_list]
-    return {
-        "request_features": request_features.tolist(),
-        "volunteer_features": X.tolist(),
-        "X_scaled": X_scaled.tolist(),
-        "req_scaled": req_scaled[0].tolist(),
-        "distances": distances_list,
-        "indices": indices_list,
-        "matched_volunteers": matched_vols
-    }
+        
+    except Exception as e:
+        logger.error(f"Error in debug matching: {str(e)}")
+        return {
+            "error": str(e),
+            "message": "Error occurred during matching process"
+        }
