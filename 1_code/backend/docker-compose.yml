@@ -4,16 +4,40 @@ version: '3.8'
 services:
   api:
     # Builds and runs the FastAPI service
-    build: .
+    build: 
+      context: .
+      dockerfile: dockerfile
+    container_name: disaster-relief-api
+    restart: unless-stopped
     ports:
       - "8000:8000"
     # Mount the service account key file into the container
     volumes:
       - ./serviceAccountKey.json:/app/serviceAccountKey.json:ro # Mount as read-only
+      - api_logs:/app/logs
     environment:
       # Tell the Firebase Admin SDK where to find the credentials
       GOOGLE_APPLICATION_CREDENTIALS: /app/serviceAccountKey.json
       # Add any other environment variables your app might need
+      ENVIRONMENT=production
+      LOG_LEVEL=info
+      MAX_WORKERS=4
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    networks:
+      - disaster-relief-network
     # depends_on: # Removed dependency on local db service
     #  - db
 
@@ -23,3 +47,10 @@ services:
 
 # volumes: # Removed the pgdata volume definition
 #  pgdata:
+
+networks:
+  disaster-relief-network:
+    driver: bridge
+
+volumes:
+  api_logs:
